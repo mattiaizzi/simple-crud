@@ -14,6 +14,7 @@ import TableRow from '@material-ui/core/TableRow';
 
 import { columns } from './users.constants';
 import { usePaginator } from './hooks/usePaginator';
+import { UserForm } from './components/UserForm/UserForm';
 
 const useStyles = makeStyles({
   root: {
@@ -97,6 +98,7 @@ export const Users = () => {
         onChangePage={handleChangePage}
         onChangeRowsPerPage={handleChangeRowsPerPage}
       />
+      <UserForm />
     </Paper>
   );
 };

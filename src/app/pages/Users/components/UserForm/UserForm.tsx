@@ -1,17 +1,11 @@
-import {
-  Button,
-  FormControl,
-  Grid,
-  makeStyles,
-  TextField,
-} from '@material-ui/core';
-import axios from 'axios';
+import { Button, FormControl, Grid, makeStyles, TextField } from '@material-ui/core';
 import React from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { User } from '../../../../models/user';
 
 interface UserFormProps {
   user?: User;
+  onSubmit: (user: User) => void;
 }
 
 const useStyles = makeStyles((theme) => ({
@@ -27,14 +21,25 @@ const useStyles = makeStyles((theme) => ({
   buttonContainer: {},
 }));
 
-export const UserForm: React.FC<UserFormProps> = ({ user = {} }) => {
+export const UserForm: React.FC<UserFormProps> = ({ user = {}, onSubmit }) => {
   const classes = useStyles();
-  const { handleSubmit, control, reset } = useForm<User>({
+  const {
+    handleSubmit,
+    control,
+    register,
+    formState: { errors },
+  } = useForm<User>({
     defaultValues: user,
   });
-  const onSubmit = (user: User) => {
-    axios.post('http://localhost:8000/users', user).then((response) => reset());
-  };
+
+  const { name, onBlur, onChange, ref } = register('email', {
+    required: 'Required',
+    pattern: {
+      value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i,
+      message: 'invalid email address',
+    },
+  });
+
   return (
     <div className={classes.root}>
       <form onSubmit={handleSubmit(onSubmit)}>
@@ -42,32 +47,16 @@ export const UserForm: React.FC<UserFormProps> = ({ user = {} }) => {
           <Grid container item xs={12} spacing={3}>
             <Grid item xs={4}>
               <FormControl fullWidth variant="outlined">
-                <Controller
-                  control={control}
-                  rules={{
-                    required: 'Required',
-                    pattern: {
-                      value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i,
-                      message: 'invalid email address',
-                    },
-                  }}
-                  name="email"
-                  render={({
-                    field: { onChange, onBlur, value, name, ref },
-                    fieldState: { invalid, isTouched, isDirty, error },
-                    formState,
-                  }) => (
-                    <TextField
-                      id="email"
-                      helperText={error ? error.message : null}
-                      variant="outlined"
-                      label="Email"
-                      error={!!error}
-                      defaultValue={value}
-                      onChange={onChange}
-                      inputRef={ref}
-                    />
-                  )}
+                <TextField
+                  id="email"
+                  helperText={errors.email ? errors.email.message : null}
+                  variant="outlined"
+                  label="Email"
+                  error={!!errors.email}
+                  name={name}
+                  onBlur={onBlur}
+                  onChange={onChange}
+                  inputRef={ref}
                 />
               </FormControl>
             </Grid>
@@ -200,7 +189,7 @@ export const UserForm: React.FC<UserFormProps> = ({ user = {} }) => {
               </FormControl>
             </Grid>
           </Grid>
-          <Grid item spacing={1}>
+          <Grid item>
             <Button type="submit" variant="outlined" color="primary">
               Submit
             </Button>

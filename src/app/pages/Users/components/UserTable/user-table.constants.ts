@@ -1,5 +1,5 @@
 import { TableCellProps } from '@material-ui/core';
-import { Address, User } from '../../models/user';
+import { Address, User } from '../../../../models/user';
 
 interface TableCellConfig<T> extends TableCellProps {
   field: keyof T;
@@ -17,7 +17,6 @@ export const columns: TableCellConfig<User>[] = [
     label: 'Indirizzo',
     minWidth: 100,
     align: 'right',
-    format: (value: Address) =>
-      `${value.street}, ${value.city}, ${value.zipcode}`,
+    format: (value: Address) => `${value.street}, ${value.city}, ${value.zipcode}`,
   },
 ];

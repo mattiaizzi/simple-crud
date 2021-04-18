@@ -1,104 +1,94 @@
 import axios from 'axios';
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useQuery } from 'react-query';
 import { User } from '../../models/user';
 import { makeStyles } from '@material-ui/core/styles';
 import Paper from '@material-ui/core/Paper';
-import Table from '@material-ui/core/Table';
-import TableBody from '@material-ui/core/TableBody';
-import TableCell from '@material-ui/core/TableCell';
-import TableContainer from '@material-ui/core/TableContainer';
-import TableHead from '@material-ui/core/TableHead';
 import TablePagination from '@material-ui/core/TablePagination';
-import TableRow from '@material-ui/core/TableRow';
 
-import { columns } from './users.constants';
 import { usePaginator } from './hooks/usePaginator';
 import { UserForm } from './components/UserForm/UserForm';
+import { UserTable } from './components/UserTable/UserTable';
+import { Modal } from '../../shared/Modal/Modal';
+import { Button } from '@material-ui/core';
 
-const useStyles = makeStyles({
+const useStyles = makeStyles((theme) => ({
   root: {
     width: '100%',
   },
-  container: {
-    maxHeight: 440,
+  paper: {
+    position: 'absolute',
+    width: 400,
+    backgroundColor: theme.palette.background.paper,
+    border: '2px solid #000',
+    boxShadow: theme.shadows[5],
+    padding: theme.spacing(2, 4, 3),
   },
-});
+}));
 
-const getAllUsers = () =>
-  axios
-    .get<User[]>('http://localhost:8000/users')
-    .then((response) => response.data);
+const getAllUsers = () => axios.get<User[]>('http://localhost:8000/users').then((response) => response.data);
 
 export const Users = () => {
   const classes = useStyles();
-  const {
-    page,
-    rowsPerPage,
-    handleChangePage,
-    handleChangeRowsPerPage,
-  } = usePaginator();
-
-  const { data = [], refetch } = useQuery<User[], Error>(
-    'getAllUsers',
-    getAllUsers,
-    { enabled: false, initialData: [] }
-  );
+  const [open, setOpen] = useState(false);
+  const [selectedUser, setSelectedUser] = useState<User>();
+  const { page, rowsPerPage, handleChangePage, handleChangeRowsPerPage, reset } = usePaginator();
+  const { data = [], refetch } = useQuery<User[], Error>('getAllUsers', getAllUsers, {
+    enabled: false,
+    initialData: [],
+  });
 
   useEffect(() => {
     refetch();
   }, [refetch]);
 
+  const handleUserSelection = (user: User) => {
+    setSelectedUser(user);
+    setOpen(true);
+  };
+
+  const handleClose = () => {
+    setOpen(false);
+    setSelectedUser(undefined);
+  };
+
+  const onSubmit = (user: User) => {
+    axios.post('http://localhost:8000/users', user).then((response) => {
+      reset();
+      handleClose();
+      refetch();
+    });
+  };
+
   return (
     <Paper className={classes.root}>
-      <TableContainer className={classes.container}>
-        <Table stickyHeader aria-label="sticky table">
-          <TableHead>
-            <TableRow>
-              {columns.map((column) => (
-                <TableCell
-                  key={column.field}
-                  align={column.align}
-                  style={{ minWidth: column.minWidth }}
-                >
-                  {column.label}
-                </TableCell>
-              ))}
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {data
-              .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-              .map((row) => {
-                return (
-                  <TableRow hover role="checkbox" tabIndex={-1} key={row.id}>
-                    {columns.map((column) => {
-                      const value = row[column.field];
-                      return (
-                        <TableCell
-                          key={`${row.id}_${column.field}`}
-                          align={column.align}
-                        >
-                          {column.format ? column.format(value) : value}
-                        </TableCell>
-                      );
-                    })}
-                  </TableRow>
-                );
-              })}
-          </TableBody>
-        </Table>
-      </TableContainer>
-      <TablePagination
-        rowsPerPageOptions={[5, 10, 25, 100]}
-        component="div"
-        count={data.length}
-        rowsPerPage={rowsPerPage}
-        page={page}
-        onChangePage={handleChangePage}
-        onChangeRowsPerPage={handleChangeRowsPerPage}
-      />
-      <UserForm />
+      <div>
+        <Button onClick={() => setOpen(true)} variant="outlined" color="primary">
+          Aggiungi
+        </Button>
+      </div>
+      {data.length === 0 ? (
+        <h1>Nessun utente presente</h1>
+      ) : (
+        <>
+          <UserTable
+            users={data.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)}
+            onSelectUser={handleUserSelection}
+          />
+          <TablePagination
+            rowsPerPageOptions={[5, 10, 25, 100]}
+            component="div"
+            count={data.length}
+            rowsPerPage={rowsPerPage}
+            page={page}
+            onChangePage={handleChangePage}
+            onChangeRowsPerPage={handleChangeRowsPerPage}
+          />
+        </>
+      )}
+      <Modal open={open} onClose={handleClose} title={selectedUser ? 'Modifica utente' : 'Inserisci nuovo utente'}>
+        <UserForm user={selectedUser} onSubmit={onSubmit} />
+      </Modal>
     </Paper>
   );
 };

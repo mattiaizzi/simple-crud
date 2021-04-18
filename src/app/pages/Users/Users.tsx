@@ -32,7 +32,7 @@ export const Users = () => {
   const classes = useStyles();
   const [open, setOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState<User>();
-  const { page, rowsPerPage, handleChangePage, handleChangeRowsPerPage, reset } = usePaginator();
+  const { page, rowsPerPage, handleChangePage, handleChangeRowsPerPage, reset } = usePaginator(10);
   const { data = [], refetch } = useQuery<User[], Error>('getAllUsers', getAllUsers, {
     enabled: false,
     initialData: [],

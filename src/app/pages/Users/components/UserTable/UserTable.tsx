@@ -16,54 +16,44 @@ interface UserTableProps {
   onSelectUser?: (user: User) => void;
 }
 
-const useStyles = makeStyles({
-  container: {
-    maxHeight: 440,
-  },
-});
-
-export const UserTable: React.FC<UserTableProps> = ({ users, onSelectUser }) => {
-  const classes = useStyles();
-
-  return (
-    <TableContainer className={classes.container}>
-      <Table stickyHeader aria-label="sticky table">
-        <TableHead>
-          <TableRow>
-            {columns.map((column) => (
-              <TableCell key={column.field} align={column.align} style={{ minWidth: column.minWidth }}>
-                {column.label}
-              </TableCell>
-            ))}
-          </TableRow>
-        </TableHead>
-        <TableBody>
-          {users.map((row) => {
-            return (
-              <TableRow
-                hover
-                role="checkbox"
-                tabIndex={-1}
-                key={row.id}
-                onClick={() => {
-                  if (onSelectUser) {
-                    onSelectUser(row);
-                  }
-                }}
-              >
-                {columns.map((column) => {
-                  const value = row[column.field];
-                  return (
-                    <TableCell key={`${row.id}_${column.field}`} align={column.align}>
-                      {column.format ? column.format(value) : value}
-                    </TableCell>
-                  );
-                })}
-              </TableRow>
-            );
-          })}
-        </TableBody>
-      </Table>
-    </TableContainer>
-  );
-};
+export const UserTable: React.FC<UserTableProps> = ({ users, onSelectUser }) => (
+  <TableContainer>
+    <Table stickyHeader aria-label="sticky table">
+      <TableHead>
+        <TableRow>
+          {columns.map((column) => (
+            <TableCell key={column.field} align={column.align} style={{ minWidth: column.minWidth }}>
+              {column.label}
+            </TableCell>
+          ))}
+        </TableRow>
+      </TableHead>
+      <TableBody>
+        {users.map((row) => {
+          return (
+            <TableRow
+              hover
+              role="checkbox"
+              tabIndex={-1}
+              key={row.id}
+              onClick={() => {
+                if (onSelectUser) {
+                  onSelectUser(row);
+                }
+              }}
+            >
+              {columns.map((column) => {
+                const value = row[column.field];
+                return (
+                  <TableCell key={`${row.id}_${column.field}`} align={column.align}>
+                    {column.format ? column.format(value) : value}
+                  </TableCell>
+                );
+              })}
+            </TableRow>
+          );
+        })}
+      </TableBody>
+    </Table>
+  </TableContainer>
+);

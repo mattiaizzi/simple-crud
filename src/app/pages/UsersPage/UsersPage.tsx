@@ -1,16 +1,16 @@
+import React, { useEffect } from 'react';
 import axios from 'axios';
-import React, { useEffect, useState } from 'react';
+import { useHistory } from 'react-router-dom';
 import { useQuery } from 'react-query';
-import { User } from '../../models/user';
 import { makeStyles } from '@material-ui/core/styles';
 import Paper from '@material-ui/core/Paper';
 import TablePagination from '@material-ui/core/TablePagination';
+import { Button } from '@material-ui/core';
 
 import { usePaginator } from './hooks/usePaginator';
-import { UserForm } from './components/UserForm/UserForm';
 import { UserTable } from './components/UserTable/UserTable';
-import { Modal } from '../../shared/Modal/Modal';
-import { Button } from '@material-ui/core';
+import { User } from '../../models/user';
+import AddIcon from '@material-ui/icons/AddCircleOutline';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -24,15 +24,17 @@ const useStyles = makeStyles((theme) => ({
     boxShadow: theme.shadows[5],
     padding: theme.spacing(2, 4, 3),
   },
+  button: {
+    margin: theme.spacing(1),
+  },
 }));
 
 const getAllUsers = () => axios.get<User[]>('http://localhost:8000/users').then((response) => response.data);
 
-export const Users = () => {
+export const UsersPage = () => {
   const classes = useStyles();
-  const [open, setOpen] = useState(false);
-  const [selectedUser, setSelectedUser] = useState<User>();
-  const { page, rowsPerPage, handleChangePage, handleChangeRowsPerPage, reset } = usePaginator(10);
+  const history = useHistory();
+  const { page, rowsPerPage, handleChangePage, handleChangeRowsPerPage } = usePaginator(10);
   const { data = [], refetch } = useQuery<User[], Error>('getAllUsers', getAllUsers, {
     enabled: false,
     initialData: [],
@@ -43,28 +45,21 @@ export const Users = () => {
   }, [refetch]);
 
   const handleUserSelection = (user: User) => {
-    setSelectedUser(user);
-    setOpen(true);
-  };
-
-  const handleClose = () => {
-    setOpen(false);
-    setSelectedUser(undefined);
-  };
-
-  const onSubmit = (user: User) => {
-    axios.post('http://localhost:8000/users', user).then((response) => {
-      reset();
-      handleClose();
-      refetch();
-    });
+    // TODO open detail page
   };
 
   return (
     <Paper className={classes.root}>
       <div>
-        <Button onClick={() => setOpen(true)} variant="outlined" color="primary">
-          Aggiungi
+        <Button
+          variant="contained"
+          color="primary"
+          size="large"
+          className={classes.button}
+          onClick={() => history.push('/users/create-user')}
+          startIcon={<AddIcon />}
+        >
+          AGGIUNGI
         </Button>
       </div>
       {data.length === 0 ? (
@@ -86,9 +81,6 @@ export const Users = () => {
           />
         </>
       )}
-      <Modal open={open} onClose={handleClose} title={selectedUser ? 'Modifica utente' : 'Inserisci nuovo utente'}>
-        <UserForm user={selectedUser} onSubmit={onSubmit} />
-      </Modal>
     </Paper>
   );
 };

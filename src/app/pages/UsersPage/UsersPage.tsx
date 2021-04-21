@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import axios from 'axios';
+
 import { useHistory } from 'react-router-dom';
 import { useQuery } from 'react-query';
 import { makeStyles } from '@material-ui/core/styles';
@@ -11,6 +11,7 @@ import { usePaginator } from './hooks/usePaginator';
 import { UserTable } from './components/UserTable/UserTable';
 import { User } from '../../models/user';
 import AddIcon from '@material-ui/icons/AddCircleOutline';
+import { getAllUsers } from '../../core/api/users';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -29,8 +30,6 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const getAllUsers = () => axios.get<User[]>('http://localhost:8000/users').then((response) => response.data);
-
 export const UsersPage = () => {
   const classes = useStyles();
   const history = useHistory();
@@ -45,7 +44,7 @@ export const UsersPage = () => {
   }, [refetch]);
 
   const handleUserSelection = (user: User) => {
-    // TODO open detail page
+    history.push(`/users/${user.id}`);
   };
 
   return (

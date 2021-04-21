@@ -7,31 +7,34 @@ import { UserDetailPage } from './pages/UserDetailPage/UserDetailPage';
 import { CreateUserPage } from './pages/CreateUserPage/CreateUserPage';
 import { Navbar } from './shared/Navbar/Navbar';
 import { Box } from '@material-ui/core';
+import { AlertProvider } from './core/context/AlertContext';
 
 const queryClient = new QueryClient();
 
 function App() {
   return (
-    <QueryClientProvider client={queryClient}>
-      <Router>
-        <Navbar />
-        <Box p={2}>
-          <Switch>
-            <Route path="/users" exact>
-              <UsersPage />
-            </Route>
-            <Route path="/users/create-user" exact>
-              <CreateUserPage />
-            </Route>
-            <Route path="/users/:id" exact component={UserDetailPage} />
-            <Route path="/users/:id/edit" exact component={EditUserPage} />
-            <Route path="*">
-              <Redirect to="users" />
-            </Route>
-          </Switch>
-        </Box>
-      </Router>
-    </QueryClientProvider>
+    <AlertProvider>
+      <QueryClientProvider client={queryClient}>
+        <Router>
+          <Navbar />
+          <Box p={2}>
+            <Switch>
+              <Route path="/users" exact>
+                <UsersPage />
+              </Route>
+              <Route path="/users/create-user" exact>
+                <CreateUserPage />
+              </Route>
+              <Route path="/users/:id" exact component={UserDetailPage} />
+              <Route path="/users/:id/edit" exact component={EditUserPage} />
+              <Route path="*">
+                <Redirect to="users" />
+              </Route>
+            </Switch>
+          </Box>
+        </Router>
+      </QueryClientProvider>
+    </AlertProvider>
   );
 }
 

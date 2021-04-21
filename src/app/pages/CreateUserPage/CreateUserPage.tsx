@@ -1,10 +1,11 @@
 import { Paper, Snackbar, Typography } from '@material-ui/core';
-import axios from 'axios';
 import React, { useReducer } from 'react';
 import Alert, { Color } from '@material-ui/lab/Alert';
 import { User } from '../../models/user';
 import { UserForm } from '../../shared/UserForm/UserForm';
 import { useHistory } from 'react-router';
+import { saveUser } from '../../core/api/users';
+import { useMutation } from 'react-query';
 
 interface AlertState {
   isOpen: boolean;
@@ -31,13 +32,14 @@ const alertReducer = (state: AlertState, action: AlertAction): AlertState => {
 export const CreateUserPage: React.FC = () => {
   const [{ isOpen, message, severity }, dispatch] = useReducer(alertReducer, { isOpen: false });
   const history = useHistory();
+  const saveUserMutation = useMutation(saveUser);
   const onSubmit = (user: User) => {
-    axios
-      .post<User>('http://localhost:8000/users', user)
+    saveUserMutation
+      .mutateAsync(user)
       .then((response) => {
         dispatch({
           type: 'open',
-          payload: { message: `L'utente ${response.data.name} è stato salvato con successo`, severity: 'success' },
+          payload: { message: `L'utente ${response.name} è stato salvato con successo`, severity: 'success' },
         });
         setTimeout(() => {
           history.goBack();

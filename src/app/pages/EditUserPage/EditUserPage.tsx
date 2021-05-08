@@ -4,7 +4,7 @@ import React, { useContext, useEffect } from 'react';
 import { useMutation, useQuery } from 'react-query';
 import { RouteComponentProps, useHistory } from 'react-router';
 import { getUser, saveUser } from '../../core/api/users';
-import { AlertContext } from '../../core/context/AlertContext';
+import { AlertContext } from '../../core/context/AlertContext/AlertContext';
 import { User, User as UserModel } from '../../models/user';
 import { UserForm } from '../../shared/UserForm/UserForm';
 

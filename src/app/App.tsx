@@ -7,7 +7,7 @@ import { UserDetailPage } from './pages/UserDetailPage/UserDetailPage';
 import { CreateUserPage } from './pages/CreateUserPage/CreateUserPage';
 import { Navbar } from './shared/Navbar/Navbar';
 import { Box } from '@material-ui/core';
-import { AlertProvider } from './core/context/AlertContext';
+import { AlertProvider } from './core/context/AlertContext/AlertContext';
 
 const queryClient = new QueryClient();
 

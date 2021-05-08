@@ -1,7 +1,7 @@
 import { Snackbar } from '@material-ui/core';
 import Alert from '@material-ui/lab/Alert';
 import React, { useReducer } from 'react';
-import { alertReducer, AlertAction } from '../reducers/alertReducer';
+import { alertReducer, AlertAction } from './reducers/alertReducer';
 
 type AlertContextType = {
   dispatch: (action: AlertAction) => void;
